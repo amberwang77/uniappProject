@@ -6,6 +6,7 @@ import { getGoodsAPI } from '@/services/goods'
 import type { GoodsResult } from '@/types/goods'
 import AddressPanel from './components/AddressPanel.vue'
 import ServicePanel from './components/ServicePanel.vue'
+import PageSkeleton from './components/PageSkeleton.vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -14,12 +15,16 @@ const query = defineProps<{
   id: string
 }>()
 
+// 页面数据是否加载完成
+const isFinished = ref<boolean>(false)
+
 // 商品详情
 const goodsData = ref<GoodsResult>()
 // 获取商品详情
 const getGoodsData = async () => {
   const res = await getGoodsAPI(query.id)
   goodsData.value = res.result
+  isFinished.value = true
 }
 
 // 轮播图下标
@@ -55,7 +60,7 @@ onLoad(() => {
 </script>
 
 <template>
-  <scroll-view scroll-y class="viewport">
+  <scroll-view scroll-y class="viewport" v-if="isFinished">
     <!-- 基本信息 -->
     <view class="goods">
       <!-- 商品主图 -->
@@ -145,6 +150,7 @@ onLoad(() => {
       </view>
     </view>
   </scroll-view>
+  <PageSkeleton v-else />
 
   <!-- 用户操作 -->
   <view class="toolbar" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
